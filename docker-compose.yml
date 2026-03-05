@@ -1,0 +1,36 @@
+services:
+  ollama:
+    image: ollama/ollama
+    container_name: ollama_nexus
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama-models:/root/.ollama
+    networks:
+      - langfuse_default
+  app:
+    build:
+      context: .
+    ports:
+      - "8000:8000"
+      - "8501:8501"
+    volumes:
+      - rag-data:/nexus-query/nexus_query/data
+    networks:
+      - langfuse_default
+    environment:
+      - MODEL_NAME=${MODEL_NAME}
+      - DB_NAME=${DB_NAME}
+      - LANGFUSE_SECRET_KEY=${LANGFUSE_SECRET_KEY}
+      - LANGFUSE_PUBLIC_KEY=${LANGFUSE_PUBLIC_KEY}
+      - LANGFUSE_BASE_URL=${LANGFUSE_BASE_URL}
+    depends_on:
+      - ollama
+      
+networks:
+  langfuse_default:
+    external: true
+
+volumes:
+  ollama-models:
+  rag-data: 
